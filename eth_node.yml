@@ -1,0 +1,85 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+    username: ubuntu
+  tasks:
+
+    - name: Install eth node 1
+      command: echo 'Y' | apt-get software-properties-common 
+
+    - name: Install eth node 2
+      command: add-apt-repository -y ppa:ethereum/ethereum
+
+    - name: Install eth node 3
+      command: apt-get update
+
+    - name: Install eth node 4
+      apt: pkg=ethereum update_cache=yes
+
+echo 'Y' | sudo apt-get install npm 
+
+ln -s /usr/bin/nodejs /usr/bin/node
+
+npm install -g ethereum-console
+
+
+mkdir data_dir
+
+geth --datadir data_dir/ init genesis_block.json
+
+geth --fast --cache 512 --ipcpath ~/Library/Ethereum/geth.ipc --networkid 1234 --datadir data_dir/  console 
+
+mv keystore data_dir/keystore # I overwrite the new accounts
+
+## GETH CONSOLE ##
+# connect to other nodes
+
+admin.nodeInfo
+
+admin.addPeer("YOURNODEURL")
+
+web3.admin.net.connect("YOURIP:30303")
+
+# create an account
+personal.newAccount("Write here a good, randomly generated, passphrase!") # Address 0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa
+web3.eth.accounts
+
+
+var primaryAccount = web3.eth.accounts[0] # primaryAccount=0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa
+web3.eth.getBalance('0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa')
+
+# Solidity installation -- outside geth
+
+
+npm install -g solc
+
+solcjs --bin --abi --optimize -o bin contract.sol
+
+# Deploying contract -- geth -- another miner has to be running 
+
+personal.unlockAccount('0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa', "Write here a good, randomly generated, passphrase!");
+
+var _greeting = 'Hello world' ;
+
+var browser_ballot_sol_greeterContract = web3.eth.contract([{"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"greet","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_greeting","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]);
+
+var browser_ballot_sol_greeter = browser_ballot_sol_greeterContract.new(
+   _greeting,
+   {
+     from: '0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa', 
+     data: '0x6060604052341561000f57600080fd5b6040516103a93803806103a983398101604052808051820191905050336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508060019080519060200190610081929190610088565b505061012d565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106100c957805160ff19168380011785556100f7565b828001600101855582156100f7579182015b828111156100f65782518255916020019190600101906100db565b5b5090506101049190610108565b5090565b61012a91905b8082111561012657600081600090555060010161010e565b5090565b90565b61026d8061013c6000396000f30060606040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806341c0e1b514610051578063cfae321714610066575b600080fd5b341561005c57600080fd5b6100646100f4565b005b341561007157600080fd5b610079610185565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100b957808201518184015260208101905061009e565b50505050905090810190601f1680156100e65780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415610183576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16ff5b565b61018d61022d565b60018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156102235780601f106101f857610100808354040283529160200191610223565b820191906000526020600020905b81548152906001019060200180831161020657829003601f168201915b5050505050905090565b6020604051908101604052806000815250905600a165627a7a723058207e2c0823e1835ca565625961834af4e73f78161fe118d744aca938887274025e0029', 
+     gas: '4700000'
+   }, function (e, contract){
+    console.log(e, contract);
+    if (typeof contract.address !== 'undefined') {
+         console.log('Contract mined! address: ' + contract.address + ' transactionHash: ' + contract.transactionHash);
+    }
+ })
+#0xc10d7d8c1b8ac034263eeaf3227544e852723484
+miner.start() # -- Once finished the DAG and started mining then test contract
+
+var greeter = eth.contract(browser_ballot_sol_greeter.abi).at(browser_ballot_sol_greeter.address);
+
+greeter.greet()
+
