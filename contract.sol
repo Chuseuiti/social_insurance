@@ -5,7 +5,7 @@ contract blacklister {
 
     mapping(address => bool) blacklist;
 
-    function secure(address address_request) public returns (string message){
+    function secure(address address_request) constant returns (string message){
         if(blacklist[address_request] == false){ 
             return 'Cancel transaction';
         }else if(blacklist[address_request] == true){
@@ -15,12 +15,12 @@ contract blacklister {
         }
     }
 
-    function set_address_blacklist(address blacklisted) public returns(string message){
+    function set_address_blacklist(address blacklisted) constant returns(string message){
         blacklist[blacklisted] = false;
         return 'Saved blacklisted address';
     }
 
-    function set_address_whitelist(address whitelisted_address) public returns(string message){
+    function set_address_whitelist(address whitelisted_address) constant returns(string message){
         blacklist[whitelisted_address] = true;
         return 'Saved whitelist address';
     }

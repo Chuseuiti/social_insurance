@@ -58,6 +58,8 @@ solcjs --bin --abi --optimize -o bin contract.sol
 
 # Deploying contract -- geth -- another miner has to be running 
 
+eth.defaultAccount = '0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa';
+
 personal.unlockAccount('0x246f159b1ac94cd6219f7f36ad05fced75ba8bfa', "Write here a good, randomly generated, passphrase!");
 
 var browser_ballot_sol_blacklisterContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"address_request","type":"address"}],"name":"secure","outputs":[{"name":"message","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"blacklisted","type":"address"}],"name":"set_address_blacklist","outputs":[{"name":"message","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"whitelisted_address","type":"address"}],"name":"set_address_whitelist","outputs":[{"name":"message","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]);
@@ -77,5 +79,7 @@ miner.start() # -- Once finished the DAG and started mining then test contract
 
 var blacklister = eth.contract(browser_ballot_sol_blacklister.abi).at(browser_ballot_sol_blacklister.address);
 var input = 0xc10d7d8c1b8ac034263eeaf3227544e852723484;
-blacklister.set_address_blacklist(0xc10d7d8c1b8ac034263eeaf3227544e852723484);
-
+var a = blacklister.secure(0xc10d7d8c1b8ac034263eeaf3227544e852723484);
+var a1 = blacklister.set_address_blacklist(0xc10d7d8c1b8ac034263eeaf3227544e852723484);
+var a2 = blacklister.set_address_whitelist(0xc10d7d8c1b8ac034263eeaf3227544e852723484);
+eth.getTransaction(a)
