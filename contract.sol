@@ -1,27 +1,30 @@
 pragma solidity ^0.4.19;
 
-contract mortal {
-  /* Define variable owner of the type address */
-  address owner;
 
-  /* This function is executed at initilization and sets the owner of the contract */
-  function mortal() public { owner = msg.sender; }
+contract blacklister {
 
-  /* Function to recover the funds on the contract */
-  function kill() public { if (msg.sender == owner) selfdestruct(owner); }
+    mapping(address => bool) blacklist;
+
+    function secure(address address_request) public returns (string message){
+        if(blacklist[address_request] == false){ 
+            return 'Cancel transaction';
+        }else if(blacklist[address_request] == true){
+            return 'Approve transaction';     
+        }else{
+            return 'Value unknown';
+        }
+    }
+
+    function set_address_blacklist(address blacklisted) public returns(string message){
+        blacklist[blacklisted] = false;
+        return 'Saved blacklisted address';
+    }
+
+    function set_address_whitelist(address whitelisted_address) public returns(string message){
+        blacklist[whitelisted_address] = true;
+        return 'Saved whitelist address';
+    }
 }
 
-contract greeter is mortal {
-  /* Define variable gretting of the type string */
-  string greeting;
 
-  /* This runs when the contract is executed */
-  function greeter(string _greeting) public {
-    greeting = _greeting;
-  }
 
-  /* Main function */
-  function greet() public constant returns (string) {
-    return greeting;
-  }
-}
